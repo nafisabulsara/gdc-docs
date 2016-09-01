@@ -417,7 +417,9 @@
       references: 'References',
       administrative: 'Administrative',
       tbd: 'References',
-      index_file: 'Index'
+      index_file: 'Index',
+      submittable_data_file: 'Submittable Data Files',
+      data_file: 'Data File',
     },
     ENTITY_LIST_DICTIONARY_KEY_ORDER: ['case', 'clinical', 'biospecimen', 'data_bundle', 'annotation', 'administrative'],
     CATEGORY_TEMPLATE_DOWNLOAD_BLACKLIST: ['tbd', 'administrative', 'index_file', 'analysis'],
@@ -786,10 +788,6 @@
       var dictionary = data[dictionaryName];
       var dictionaryCategory = _.get(dictionary, 'category');
 
-      if (dictionaryCategory === 'data_file') {
-        dictionary.category = 'data_bundle';
-      }
-
       if (dictionaryName === 'case') {
         dictionary.category = 'case';
       }
@@ -798,13 +796,9 @@
         dictionary.category = 'annotation';
       }
 
-      //console.log(dictionary);
       dictionaryData[dictionaryName] = dictionary;
 
     }
-
-    //console.log(dictionaryData);
-
 
     return dictionaryData;
   }
@@ -830,10 +824,20 @@
         if (dictDataList.hasOwnProperty(dictionaryTitle)) {
           acc.dictionaries = acc.dictionaries.concat(dictionary);
         }
-        acc.dictionaryMapByCategory[dictionary.category] = (acc.dictionaryMapByCategory[dictionary.category] || []).concat(dictionary);
+        // categorize by 'category' field except for data_file and metadata_file
+        // furthur break those down into 'Submittable Data Files' (submittable) and 'Data Files' (!submittable)
+        if (dictionary.category === 'data_file' || dictionary.category === 'metadata_file') {
+          if (dictionary.submittable) {
+            acc.dictionaryMapByCategory.submittable_data_file = acc.dictionaryMapByCategory.submittable_data_file.concat(dictionary);
+          } else {
+            acc.dictionaryMapByCategory.data_file = acc.dictionaryMapByCategory.data_file.concat(dictionary);
+          }
+        } else {
+          acc.dictionaryMapByCategory[dictionary.category] = (acc.dictionaryMapByCategory[dictionary.category] || []).concat(dictionary);
+        }
       }
       return acc;
-    }, {dictionaries: [], dictionaryMap: dictDataList, dictionaryMapByCategory: {}});
+    }, {dictionaries: [], dictionaryMap: dictDataList, dictionaryMapByCategory: {'submittable_data_file': [], 'data_file': []}});
   }
   /////////////////////////////////////////////////////////
 
