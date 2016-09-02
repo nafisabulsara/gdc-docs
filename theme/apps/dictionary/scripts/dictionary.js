@@ -411,7 +411,6 @@
       case: 'Case',
       clinical: 'Clinical',
       biospecimen: 'Biospecimen',
-      data_bundle: 'Experiment Data',
       annotation: 'Annotations',
       data_file: 'Data Files',
       references: 'References',
@@ -421,18 +420,16 @@
       submittable_data_file: 'Submittable Data Files',
       data_file: 'Data File',
     },
-    ENTITY_LIST_DICTIONARY_KEY_ORDER: ['case', 'clinical', 'biospecimen', 'data_bundle', 'annotation', 'administrative'],
+    ENTITY_LIST_DICTIONARY_KEY_ORDER: ['case', 'clinical', 'biospecimen', 'submittable_data_file', 'data_file', 'annotation', 'administrative', 'analysis', 'notation'],
     CATEGORY_TEMPLATE_DOWNLOAD_BLACKLIST: ['tbd', 'administrative', 'index_file', 'analysis'],
     CATEGORY_EXCLUDES: ['TBD'],
     CATEGORY_TEMPLATE_EXCLUDES: {
       clinical: ['clinical'],
-      data_bundle: ['file', 'generated_file', 'clinical_data_bundle', 'biospecimen_data_bundle', 'pathology_data_bundle'],
       annotation: ['analysis', 'archive', 'publication', 'slide']
     },
     LINK_EXCLUDES: ['file', 'biospecimen_data_bundle', 'clinical_data_bundle', 'pathology_data_bundle'],
     PROPERTY_EXCLUDES: ['type', 'clinical_data_bundles', 'biospecimen_data_bundles', 'pathology_data_bundles'],
     CATEGORY_TEMPLATE_INCLUDES: {
-      data_bundle: ['read_group', 'submitted_unaligned_reads', 'slide', 'slide_image']
     },
     END_POINT: {
       DEFAULT_URL: 'https://gdc-api.nci.nih.gov', // TODO: env variable? 'http://localhost:5000'
@@ -814,7 +811,7 @@
     var dictDataList = _sanitizeDictionaryData(data);
 
     // Build our data structures and corresponding caches
-    return Object.keys(dictDataList).reduce(function (acc, dictionaryTitle) {
+    var r = Object.keys(dictDataList).reduce(function (acc, dictionaryTitle) {
       var dictionary = dictDataList[dictionaryTitle];
       if (dictionaryTitle[0] === '_') {
         // Add special private data prefixed with '_' to the dictionary data object top level
@@ -838,6 +835,7 @@
       }
       return acc;
     }, {dictionaries: [], dictionaryMap: dictDataList, dictionaryMapByCategory: {'submittable_data_file': [], 'data_file': []}});
+    return r;
   }
   /////////////////////////////////////////////////////////
 
