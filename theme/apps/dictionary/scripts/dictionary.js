@@ -94,6 +94,7 @@
           _dictionary.getDataFromSource()
             .then(function (rawDictionaryData) {
 
+              debugger
               _dictionary._data = _initDictionaryData(rawDictionaryData);
 
               _dictionary._d3Containers.views = _getD3ViewsForDictionary(_dictionary, _.bind(_dictionary.viewListener, _dictionary));
@@ -170,6 +171,8 @@
 
       case _DICTIONARY_CONSTANTS.VIEW_UPDATE_EVENT_TYPES.TEMPLATE_DOWNLOAD_BY_CATEGORY_REQUESTED:
 
+        console.trace();
+        console.log(params);
         if (_.has(params, 'id')) {
          _dictionary.getDictionaryTemplates(params.id, _.get(params, 'excludes', null));
         }
@@ -224,7 +227,7 @@
         entityCategories = categories,
         fileFormat = dataFormat || _dictionary._options.defaultTemplateDownloadFormat,
         entityExclusions = _.isArray(excludes) && excludes.length ? excludes : [],
-        params = {format: fileFormat},
+        params = { format: fileFormat },
         webServiceURL = _dictionary._options.dataSourceBaseHost + _parseContextPattern(_DICTIONARY_CONSTANTS.END_POINT.CONTEXT_TEMPLATE_PATTERN, {dictionary_name: ''}),
         containerEl = _dictionary._containerEl;
 
@@ -338,7 +341,7 @@
     view = _dictionary._getView(viewMode);
 
     if (_.has(urlParams, 'id')) {
-      params = {id: urlParams.id};
+      params = {id: urlParams.id, excludes: ['test']};
     }
 
     var viewEvent = new Dictionary._ViewUpdateObject(view, _DICTIONARY_CONSTANTS.VIEW_UPDATE_EVENT_TYPES.NAV, params);
@@ -421,7 +424,7 @@
       data_file: 'Data File',
     },
     ENTITY_LIST_DICTIONARY_KEY_ORDER: ['case', 'clinical', 'biospecimen', 'submittable_data_file', 'data_file', 'annotation', 'administrative', 'analysis', 'notation'],
-    CATEGORY_TEMPLATE_DOWNLOAD_BLACKLIST: ['tbd', 'administrative', 'index_file', 'analysis'],
+    CATEGORY_TEMPLATE_DOWNLOAD_BLACKLIST: ['tbd', 'administrative', 'index_file', 'analysis', 'notation', 'data_file'],
     CATEGORY_EXCLUDES: ['TBD'],
     CATEGORY_TEMPLATE_EXCLUDES: {
       clinical: ['clinical'],
@@ -432,7 +435,7 @@
     CATEGORY_TEMPLATE_INCLUDES: {
     },
     END_POINT: {
-      DEFAULT_URL: 'https://gdc-api.nci.nih.gov', // TODO: env variable? 'http://localhost:5000'
+      DEFAULT_URL: 'http://localhost:5000', // TODO: env variable? 'http://localhost:5000'
       CONTEXT_PROGRAM_PROJECT_PATTERN: '/v0/submission/${program}/${project}/_dictionary/${dictionary_name}',
       CONTEXT_PATTERN: '/v0/submission/_dictionary/${dictionary_name}',
       CONTEXT_TEMPLATE_PATTERN: '/v0/submission/template/${dictionary_name}',
@@ -774,7 +777,7 @@
     delete data.clinical_data_bundle;
     delete data.pathology_data_bundle;
     delete data.clinical;
-    delete data.file;
+    //delete data.file;
     delete data.generated_file;
 
 
@@ -809,9 +812,14 @@
     }
 
     var dictDataList = _sanitizeDictionaryData(data);
+    debugger
 
     // Build our data structures and corresponding caches
     var r = Object.keys(dictDataList).reduce(function (acc, dictionaryTitle) {
+      console.log(dictionaryTitle);
+      if (dictionaryTitle === 'file') {
+        debugger
+      }
       var dictionary = dictDataList[dictionaryTitle];
       if (dictionaryTitle[0] === '_') {
         // Add special private data prefixed with '_' to the dictionary data object top level
